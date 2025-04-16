@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  labels:
+    app: mongo
+spec:
+  replicas: 1  # Change this to at least 1 so the pod gets created
+  selector:
+    matchLabels:
+      app: mongo  # This must match template.metadata.labels
+  template:
+    metadata:
+      labels:
+        app: mongo  # Ensure this matches the selector
+    spec:
+      containers:
+      - name: mongo
+        image: mongo  # Specify a stable version
+        ports:
+        - name: mongo
+          containerPort: 27017
+        volumeMounts:
+        - name: mongo-db
+          mountPath: /data/db
+      volumes:
+      - name: mongo-db
+        persistentVolumeClaim:
+          claimName: mongo-storage
+

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pacman
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: pacman
+  template:
+    metadata:
+      labels:
+        app: pacman
+      annotations:
+        instrumentation.opentelemetry.io/inject-nodejs: default/my-splunk-otel-collector
+    spec:
+      containers:
+        - name: pacman
+          image: quay.io/pgattamaneni/pacman-app:latest
+          env:
+            - name: SPLUNK_OTEL_AGENT
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://$(SPLUNK_OTEL_AGENT):4318"
+            - name: OTEL_SERVICE_NAME
+              value: "pacman"
+            - name: OTEL_RESOURCE_ATTRIBUTES
+              value: "deployment.environment=prod,service.version=1.0"
+            - name: SPLUNK_METRICS_ENABLED
+              value: "true"
+            - name: SPLUNK_AUTOMATIC_LOG_COLLECTION
+              value: "true"
+            - name: MONGO_SERVICE_HOST
+              value: "34.72.163.210"
+            - name: MONGO_VALIDATE_SSL
+              value: "false"
+          command:
+            - node
+            - -r
+            - "@splunk/otel/instrument"
+            - bin/server.js

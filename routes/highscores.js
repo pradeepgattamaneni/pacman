@@ -89,8 +89,8 @@ router.post('/', urlencodedParser, function(req, res, next) {
                     score: userScore,
                     level: userLevel,
                     rs: returnStatus
-                console.log('res', res)
                 });
+                console.log('res', res)
             });
     });
 });

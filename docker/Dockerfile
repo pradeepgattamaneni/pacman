@@ -14,10 +14,13 @@ RUN npm install
 
 # Install the @splunk/otel package
 RUN npm install @splunk/otel
+RUN npm install @splunk/otel-web --save
+
 # Set appropriate permissions
 RUN chmod -R go+r /usr/src/app/node_modules/@splunk/otel
 
-
+#install mongo latest driver
+RUN npm install mongodb@^5.7.0
 # Expose port 8080
 EXPOSE 8080
 

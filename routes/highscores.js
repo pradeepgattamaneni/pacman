@@ -21,6 +21,7 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
         // Retrieve the top 10 high scores
         var col = db.collection('highscore');
+        console.log('collection', col)
         col.find({}).sort([['score', -1]]).limit(10).toArray(function(err, docs) {
             var result = [];
             if (err) {
@@ -54,6 +55,7 @@ router.post('/', urlencodedParser, function(req, res, next) {
         }
 
         // Insert high score with extra user data
+        console.log('high_score')
         db.collection('highscore').insertOne({
                 name: req.body.name,
                 cloud: req.body.cloud,
@@ -87,6 +89,7 @@ router.post('/', urlencodedParser, function(req, res, next) {
                     score: userScore,
                     level: userLevel,
                     rs: returnStatus
+                console.log('res', res)
                 });
             });
     });

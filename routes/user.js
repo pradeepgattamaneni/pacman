@@ -23,6 +23,7 @@ router.get('/id', function(req, res, next) {
 
         // Insert user ID and return back generated ObjectId
         var userId = 0;
+        console.log(userId)
         db.collection('userstats').insertOne({
             date: Date()
         }, {

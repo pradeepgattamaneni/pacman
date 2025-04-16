@@ -12,7 +12,7 @@ spec:
   template:
     metadata:
       labels:
-        app: mongo  # Ensure this matches the selector
+        app: mongo:1.32  # Ensure this matches the selector
     spec:
       containers:
       - name: mongo

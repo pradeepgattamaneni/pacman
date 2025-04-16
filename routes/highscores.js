@@ -90,9 +90,9 @@ router.post('/', urlencodedParser, function(req, res, next) {
                     level: userLevel,
                     rs: returnStatus
                 });
-                console.log('res', res)
             });
     });
+    console.log('res', res)
 });
 
 module.exports = router;

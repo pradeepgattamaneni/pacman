@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:current-alpine
 
 LABEL maintainer="PRADEEP G"
 
@@ -6,11 +6,14 @@ LABEL maintainer="PRADEEP G"
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
-# Clone game source code
-RUN git clone https://github.com/pradeepgattamaneni/pacman.git .
+# Install app dependencies
+COPY package*.json ./
 
 # Install app dependencies
-RUN npm install
+# Development
+#RUN npm install
+# Production
+RUN npm ci --only=production
 
 # Install the @splunk/otel package
 RUN npm install @splunk/otel
@@ -19,10 +22,10 @@ RUN npm install @splunk/otel-web --save
 # Set appropriate permissions
 RUN chmod -R go+r /usr/src/app/node_modules/@splunk/otel
 
-#install mongo latest driver
-RUN npm install mongodb@^5.7.0
+COPY . .
+
 # Expose port 8080
 EXPOSE 8080
 
 # Run container
-CMD ["npm", "start-instrumented"]
+CMD ["npm", "start"]

@@ -1,6 +1,6 @@
 FROM node:current-alpine
 
-LABEL org.opencontainers.image.authors="sylvain@huguet.me"
+LABEL maintainer="PRADEEP G"
 
 # Create app directory
 RUN mkdir -p /usr/src/app
@@ -15,12 +15,17 @@ COPY package*.json ./
 # Production
 RUN npm ci --only=production
 
-# Bundle app source
-# Refer to .dockerignore to exclude content as needed
+# Install the @splunk/otel package
+RUN npm install @splunk/otel
+RUN npm install @splunk/otel-web --save
+
+# Set appropriate permissions
+RUN chmod -R go+r /usr/src/app/node_modules/@splunk/otel
+
 COPY . .
 
 # Expose port 8080
 EXPOSE 8080
 
 # Run container
-CMD [ "npm", "start" ]
+CMD ["npm", "start"]

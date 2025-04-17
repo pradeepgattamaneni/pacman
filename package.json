@@ -6,7 +6,8 @@
   "main": "bin/server.js",
   "scripts": {
     "start": "node .",
-    "dev": "nodemon ."
+    "dev": "nodemon .",
+    "start-instrumented": "node -r @splunk/otel/instrument ."
   },
   "license": "GPLv3",
   "dependencies": {

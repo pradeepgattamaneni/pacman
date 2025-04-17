@@ -25,4 +25,4 @@ RUN npm install mongodb@^5.7.0
 EXPOSE 8080
 
 # Run container
-CMD ["npm", "start"]
+CMD ["npm", "start-instrumented"]

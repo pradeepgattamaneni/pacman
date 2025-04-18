@@ -1,8 +1,11 @@
+import { trace } from '@opentelemetry/api';
+
 import { Router } from 'express';
 var router = Router();
 import pkg from 'body-parser';
 const { urlencoded } = pkg;
 import Database from '../lib/database.js';
+
 
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = urlencoded({ extended: false })
@@ -12,6 +15,8 @@ router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date());
   next();
 })
+
+const tracer = trace.getTracer('pacman', '0.1.0');
 
 router.get('/list', urlencodedParser, function(req, res, next) {
   console.log('[GET /highscores/list]');
@@ -46,8 +51,19 @@ router.post('/', urlencodedParser, function(req, res, next) {
               ' user-agent =', req.headers['user-agent'],
               ' referer =', req.headers.referer);
 
+
   var userScore = parseInt(req.body.score, 10),
       userLevel = parseInt(req.body.level, 10);
+
+  tracer.startActiveSpan('score', (span) => {
+	    span.setAttribute('score', userScore);
+	    span.end();
+	    });
+
+  tracer.startActiveSpan('level', (span) => {
+	    span.setAttribute('level', userLevel);
+	    span.end();
+	    });
 
   Database.getDb(req.app, function(err, db) {
     if (err) {

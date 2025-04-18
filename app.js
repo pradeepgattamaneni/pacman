@@ -1,6 +1,6 @@
 'use strict';
+import * as opentelemetry from '@opentelemetry/api';
 
-import './splunk-instrumentation.js';
 import express  from 'express';
 import path from 'path';
 import {fileURLToPath} from 'url';

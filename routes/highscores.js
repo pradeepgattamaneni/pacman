@@ -16,10 +16,12 @@ router.use(function timeLog (req, res, next) {
   next();
 })
 
-const tracer = trace.getTracer('pacman', '0.1.0');
+const tracer = trace.getTracer('pacman');
+
 
 router.get('/list', urlencodedParser, function(req, res, next) {
   console.log('[GET /highscores/list]');
+  const span = tracer.startSpan('get_highscore');
   Database.getDb(req.app, function(err, db) {
     if (err) {
       return next(err);
@@ -34,12 +36,15 @@ router.get('/list', urlencodedParser, function(req, res, next) {
       }
 
       docs.forEach(function(item, index, array) {
+        span.setStatus({ code: 1, message: 'result displayed' });
         result.push({ name: item['name'], cloud: item['cloud'],
                       zone: item['zone'], host: item['host'],
                       score: item['score'] });
       });
 
       res.json(result);
+      span.setStatus({ code: 2, message: 'result printed' });
+      span.end();
     });
   });
 });
@@ -55,21 +60,12 @@ router.post('/', urlencodedParser, function(req, res, next) {
   var userScore = parseInt(req.body.score, 10),
       userLevel = parseInt(req.body.level, 10);
 
-  tracer.startActiveSpan('score', (span) => {
-	    span.setAttribute('score', userScore);
-	    span.end();
-	    });
-
-  tracer.startActiveSpan('level', (span) => {
-	    span.setAttribute('level', userLevel);
-	    span.end();
-	    });
-
   Database.getDb(req.app, function(err, db) {
     if (err) {
       return next(err);
     }
 
+    const span = tracer.startSpan('insert_highscore');
     // Insert high score with extra user data
     db.collection('highscore').insertOne({
       name: req.body.name,
@@ -91,9 +87,11 @@ router.post('/', urlencodedParser, function(req, res, next) {
       var returnStatus = '';
 
       if (err) {
+        span.setStatus({ code: 1, message: err});
         console.log(err);
         returnStatus = 'error';
       } else {
+        span.setStatus({ code: 2, message: 'Successfully inserted highscore' });
         console.log('Successfully inserted highscore');
         returnStatus = 'success';
       }
@@ -106,6 +104,7 @@ router.post('/', urlencodedParser, function(req, res, next) {
         rs: returnStatus
       });
     });
+    span.end();
   });
 });
 

@@ -36,7 +36,7 @@ spec:
             - name: SPLUNK_AUTOMATIC_LOG_COLLECTION
               value: "true"
             - name: MONGO_SERVICE_HOST
-              value: "34.72.163.210"
+              value: "35.185.84.192"
             - name: MONGO_VALIDATE_SSL
               value: "false"
           command:

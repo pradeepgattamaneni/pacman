@@ -43,6 +43,7 @@ router.get('/list', urlencodedParser, function(req, res, next) {
       });
 
       res.json(result);
+      const span = tracer.startSpan('highscore_list');
       span.setStatus({ code: 2, message: 'result printed' });
       span.end();
     });
@@ -95,6 +96,8 @@ router.post('/', urlencodedParser, function(req, res, next) {
         console.log('Successfully inserted highscore');
         returnStatus = 'success';
       }
+
+      const span = tracer.startSpan('insert_highscore_completed');
 
       res.json({
         name: req.body.name,

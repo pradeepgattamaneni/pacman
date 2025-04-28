@@ -1,3 +1,5 @@
+import { trace } from '@opentelemetry/api';
+
 import { Router } from 'express';
 var router = Router();
 import pkg from 'body-parser';
@@ -14,8 +16,11 @@ router.use(function timeLog (req, res, next) {
   next();
 })
 
+const tracer = trace.getTracer('pacman');
+
 router.get('/id', function(req, res, next) {
   console.log('[GET /user/id]');
+  const span = tracer.startSpan('get_user_id');
   Database.getDb(req.app, function(err, db) {
     if (err) {
       return next(err);
@@ -36,11 +41,13 @@ router.get('/id', function(req, res, next) {
         console.log('Successfully inserted new user ID = ', userId);
       }
       res.json(userId);
+      span.end()
     });
   });
 });
 
 router.post('/stats', urlencodedParser, function(req, res, next) {
+  const span = tracer.startSpan('get_stats');
   console.log('[POST /user/stats]\n',
               ' body =', req.body, '\n',
               ' host =', req.headers.host,
@@ -94,12 +101,14 @@ router.post('/stats', urlencodedParser, function(req, res, next) {
         res.json({
           rs: returnStatus
         });
+        span.end()
       });
   });
 });
 
 router.get('/stats', function(req, res, next) {
   console.log('[GET /user/stats]');
+  const span = tracer.startSpan('get_user_stats');
 
   Database.getDb(req.app, function(err, db) {
     if (err) {

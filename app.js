@@ -1,6 +1,4 @@
 'use strict';
-import { start } from '@splunk/otel';
-import { trace, context } from '@opentelemetry/api';
 
 import express  from 'express';
 import path from 'path';
@@ -13,6 +11,16 @@ const register = new client.Registry();
 
 // Collect system metrics (CPU, memory, event loop, etc.)
 client.collectDefaultMetrics({ register });
+
+import { start } from '@splunk/otel'
+import opentelemetry from '@opentelemetry/api';
+
+start({
+  serviceName: 'pacman-service',
+  endpoint: 'http://localhost:4318'
+});
+
+const tracer = opentelemetry.trace.getTracer('pacman', '0.0.1');
 
 // Example custom metric: homepage hits
 const homepageHits = new client.Counter({

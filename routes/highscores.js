@@ -1,5 +1,3 @@
-import { trace } from '@opentelemetry/api';
-
 import { Router } from 'express';
 var router = Router();
 import pkg from 'body-parser';
@@ -15,13 +13,14 @@ router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date());
   next();
 })
+import opentelemetry from '@opentelemetry/api';
 
-const tracer = trace.getTracer('pacman');
-
+const tracer = opentelemetry.trace.getTracer('pacman', '0.0.1');
 
 router.get('/list', urlencodedParser, function(req, res, next) {
   console.log('[GET /highscores/list]');
-  const span = tracer.startSpan('get_highscore');
+  const span = tracer.startSpan('/highscores/list', { 'kind':opentelemetry.SpanKind.SERVER });
+  span.addEvent('getting highscore');
   Database.getDb(req.app, function(err, db) {
     if (err) {
       return next(err);
@@ -37,17 +36,19 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
       docs.forEach(function(item, index, array) {
         span.setStatus({ code: 1, message: 'result displayed' });
-        result.push({ name: item['name'], cloud: item['cloud'],
+        result.push({ name: item['console.log('highscore: ', item['score']);'], cloud: item['cloud'],
                       zone: item['zone'], host: item['host'],
                       score: item['score'] });
+        console.log('name: ', item['name']);
+        console.log('highscore: ', item['score']);
       });
 
       res.json(result);
-      const span = tracer.startSpan('highscore_list');
-      span.setStatus({ code: 2, message: 'result printed' });
-      span.end();
+
     });
   });
+  span.setStatus({ 'code':opentelemetry.SpanStatusCode.OK, 'message':'success' });
+  span.end();
 });
 
 // Accessed at /highscores
@@ -56,7 +57,9 @@ router.post('/', urlencodedParser, function(req, res, next) {
               ' host =', req.headers.host,
               ' user-agent =', req.headers['user-agent'],
               ' referer =', req.headers.referer);
-
+  const span = tracer.startSpan('/post/highscores', { 'kind':opentelemetry.SpanKind.SERVER });
+  span.addEvent('loading highscore');
+  span.end();
 
   var userScore = parseInt(req.body.score, 10),
       userLevel = parseInt(req.body.level, 10);
@@ -66,7 +69,10 @@ router.post('/', urlencodedParser, function(req, res, next) {
       return next(err);
     }
 
-    const span = tracer.startSpan('insert_highscore');
+    const span = tracer.startSpan('insert/highscore', { 'kind':opentelemetry.SpanKind.SERVER });
+    span.setAttribute('highscore',userScore);
+    span.addEvent('doing something');
+
     // Insert high score with extra user data
     db.collection('highscore').insertOne({
       name: req.body.name,
@@ -88,16 +94,12 @@ router.post('/', urlencodedParser, function(req, res, next) {
       var returnStatus = '';
 
       if (err) {
-        span.setStatus({ code: 1, message: err});
         console.log(err);
         returnStatus = 'error';
       } else {
-        span.setStatus({ code: 2, message: 'Successfully inserted highscore' });
         console.log('Successfully inserted highscore');
         returnStatus = 'success';
       }
-
-      const span = tracer.startSpan('insert_highscore_completed');
 
       res.json({
         name: req.body.name,
@@ -107,6 +109,7 @@ router.post('/', urlencodedParser, function(req, res, next) {
         rs: returnStatus
       });
     });
+    span.setStatus({ 'code':opentelemetry.SpanStatusCode.OK, 'message':'success' });
     span.end();
   });
 });

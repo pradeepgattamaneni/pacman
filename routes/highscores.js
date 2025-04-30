@@ -13,14 +13,11 @@ router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date());
   next();
 })
-import opentelemetry from '@opentelemetry/api';
 
-const tracer = opentelemetry.trace.getTracer('pacman', '0.0.1');
+
 
 router.get('/list', urlencodedParser, function(req, res, next) {
   console.log('[GET /highscores/list]');
-  const span = tracer.startSpan('/highscores/list', { 'kind':opentelemetry.SpanKind.SERVER });
-  span.addEvent('getting highscore');
   Database.getDb(req.app, function(err, db) {
     if (err) {
       return next(err);
@@ -35,7 +32,6 @@ router.get('/list', urlencodedParser, function(req, res, next) {
       }
 
       docs.forEach(function(item, index, array) {
-        span.setStatus({ code: 1, message: 'result displayed' });
         result.push({ name: item['name'], cloud: item['cloud'],
                       zone: item['zone'], host: item['host'],
                       score: item['score'] });
@@ -47,8 +43,6 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
     });
   });
-  span.setStatus({ 'code':opentelemetry.SpanStatusCode.OK, 'message':'success' });
-  span.end();
 });
 
 // Accessed at /highscores
@@ -57,9 +51,6 @@ router.post('/', urlencodedParser, function(req, res, next) {
               ' host =', req.headers.host,
               ' user-agent =', req.headers['user-agent'],
               ' referer =', req.headers.referer);
-  const span = tracer.startSpan('/post/highscores', { 'kind':opentelemetry.SpanKind.SERVER });
-  span.addEvent('loading highscore');
-  span.end();
 
   var userScore = parseInt(req.body.score, 10),
       userLevel = parseInt(req.body.level, 10);
@@ -69,9 +60,6 @@ router.post('/', urlencodedParser, function(req, res, next) {
       return next(err);
     }
 
-    const span = tracer.startSpan('insert/highscore', { 'kind':opentelemetry.SpanKind.SERVER });
-    span.setAttribute('highscore',userScore);
-    span.addEvent('doing something');
 
     // Insert high score with extra user data
     db.collection('highscore').insertOne({
@@ -109,8 +97,6 @@ router.post('/', urlencodedParser, function(req, res, next) {
         rs: returnStatus
       });
     });
-    span.setStatus({ 'code':opentelemetry.SpanStatusCode.OK, 'message':'success' });
-    span.end();
   });
 });
 

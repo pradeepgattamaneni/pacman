@@ -16,8 +16,6 @@ COPY package*.json ./
 RUN npm install
 
 # Install the @splunk/otel package
-RUN npm install @opentelemetry/instrumentation-express
-RUN npm install @opentelemetry/api
 RUN npm install @splunk/otel
 
 RUN npm install prom-client
@@ -32,5 +30,3 @@ COPY . .
 EXPOSE 8080
 
 EXPOSE 4318
-
-CMD [ "npm", "start" ]

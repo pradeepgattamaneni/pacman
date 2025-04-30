@@ -36,12 +36,15 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
       docs.forEach(function(item, index, array) {
         span.setStatus({ code: 1, message: 'result displayed' });
-        result.push({ name: item['console.log('highscore: ', item['score']);'], cloud: item['cloud'],
+        result.push({ name: item['name'], cloud: item['cloud'],
                       zone: item['zone'], host: item['host'],
                       score: item['score'] });
+        console.log('name: ', item['name']);
+        console.log('highscore: ', item['score']);
       });
+
       res.json(result);
-      console.log('highscores displayed');
+
     });
   });
   span.setStatus({ 'code':opentelemetry.SpanStatusCode.OK, 'message':'success' });

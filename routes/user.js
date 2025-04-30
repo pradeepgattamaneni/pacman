@@ -37,7 +37,6 @@ router.get('/id', function(req, res, next) {
         console.log('Successfully inserted new user ID = ', userId);
       }
       res.json(userId);
-      span.end()
     });
   });
 });

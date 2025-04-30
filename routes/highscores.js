@@ -39,12 +39,9 @@ router.get('/list', urlencodedParser, function(req, res, next) {
         result.push({ name: item['console.log('highscore: ', item['score']);'], cloud: item['cloud'],
                       zone: item['zone'], host: item['host'],
                       score: item['score'] });
-        console.log('name: ', item['name']);
-        console.log('highscore: ', item['score']);
       });
-
       res.json(result);
-
+      console.log('highscores displayed');
     });
   });
   span.setStatus({ 'code':opentelemetry.SpanStatusCode.OK, 'message':'success' });

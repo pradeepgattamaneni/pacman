@@ -5,24 +5,11 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import Database from './lib/database.js';
 
-// Prometheus setup
-import client from 'prom-client';
-const register = new client.Registry();
-
-
-// Collect system metrics (CPU, memory, event loop, etc.)
-client.collectDefaultMetrics({ register });
-
-// Example custom metric: homepage hits
-const homepageHits = new client.Counter({
-  name: 'pacman_homepage_hits_total',
-  help: 'Total number of times the homepage was accessed',
-});
-register.registerMetric(homepageHits);
 
 // Constants
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 
 // Routes
 import highscores from './routes/highscores.js';
@@ -43,13 +30,6 @@ app.use('/', express.static(path.join(__dirname, 'public')));
 app.use('/highscores', highscores);
 app.use('/user', user);
 app.use('/location', loc);
-
-// Prometheus /metrics endpoint
-app.get('/metrics', async (req, res) => {
-  res.set('Content-Type', register.contentType);
-  res.end(await register.metrics());
-});
-
 
 // Catch 404 and forward to error handler
 app.use(function(req, res, next) {

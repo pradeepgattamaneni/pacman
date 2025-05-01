@@ -12,7 +12,7 @@ spec:
       labels:
         app: pacman
       annotations:
-        instrumentation.opentelemetry.io/inject-nodejs: default/my-splunk-otel-collector
+        instrumentation.opentelemetry.io/inject-nodejs: splunk/my-splunk-otel-collector
         prometheus.io/scrape: "true"
         prometheus.io/path: /metrics
         prometheus.io/port: "8080"

@@ -1,8 +1,0 @@
-# prometheus.yml
-global:
-  scrape_interval: 15s
-
-scrape_configs:
-  - job_name: 'pacman'
-    static_configs:
-      - targets: ['pacman:8080']  # Use container name

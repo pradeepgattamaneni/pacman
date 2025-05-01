@@ -14,8 +14,6 @@ router.use(function timeLog (req, res, next) {
   next();
 })
 
-
-
 router.get('/list', urlencodedParser, function(req, res, next) {
   console.log('[GET /highscores/list]');
   Database.getDb(req.app, function(err, db) {
@@ -40,7 +38,6 @@ router.get('/list', urlencodedParser, function(req, res, next) {
       });
 
       res.json(result);
-
     });
   });
 });

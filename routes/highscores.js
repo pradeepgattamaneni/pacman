@@ -4,6 +4,8 @@ import pkg from 'body-parser';
 const { urlencoded } = pkg;
 import Database from '../lib/database.js';
 
+import opentelemetry from '@opentelemetry/api'
+const tracer = opentelemetry.trace.getTracer('pacman')
 
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = urlencoded({ extended: false })
@@ -17,6 +19,8 @@ router.use(function timeLog (req, res, next) {
 router.get('/list', urlencodedParser, function(req, res, next) {
   console.log('[GET /highscores/list]');
   Database.getDb(req.app, function(err, db) {
+    const span = tracer.startSpan('/high_scores/list', {'kind':opentelemetry.SpanKind.SERVER});
+    span.setAttribute('high_score_list', 'loading_score')
     if (err) {
       return next(err);
     }
@@ -39,6 +43,7 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
       res.json(result);
     });
+    span.end()
   });
 });
 
@@ -53,12 +58,16 @@ router.post('/', urlencodedParser, function(req, res, next) {
       userLevel = parseInt(req.body.level, 10);
 
   Database.getDb(req.app, function(err, db) {
+
+    const span = tracer.startSpan('/high_scores', {'kind':opentelemetry.SpanKind.SERVER});
     if (err) {
       return next(err);
     }
 
 
     // Insert high score with extra user data
+    span.setAttribute('name', req.body.name)
+    span.setAttribute('high_score', userScore)
     db.collection('highscore').insertOne({
       name: req.body.name,
       cloud: req.body.cloud,
@@ -94,6 +103,7 @@ router.post('/', urlencodedParser, function(req, res, next) {
         rs: returnStatus
       });
     });
+    span.end()
   });
 });
 

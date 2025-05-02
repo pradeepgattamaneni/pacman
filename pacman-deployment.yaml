@@ -12,10 +12,7 @@ spec:
       labels:
         app: pacman
       annotations:
-        instrumentation.opentelemetry.io/inject-nodejs: splunk/my-splunk-otel-collector
-        prometheus.io/scrape: "true"
-        prometheus.io/path: /metrics
-        prometheus.io/port: "8080"
+        instrumentation.opentelemetry.io/inject-nodejs: default/my-splunk-otel-collector
     spec:
       containers:
         - name: pacman
@@ -30,13 +27,9 @@ spec:
             - name: OTEL_SERVICE_NAME
               value: "pacman"
             - name: OTEL_RESOURCE_ATTRIBUTES
-              value: "deployment.environment=prod,service.version=1.0"
-            - name: SPLUNK_METRICS_ENABLED
-              value: "true"
-            - name: SPLUNK_AUTOMATIC_LOG_COLLECTION
-              value: "true"
+              value: "deployment.environment=production,service.version=0.0.1"
             - name: MONGO_SERVICE_HOST
-              value: "35.185.84.192"
+              value: "104.196.11.24"
             - name: MONGO_VALIDATE_SSL
               value: "false"
           command:

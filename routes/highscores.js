@@ -4,6 +4,17 @@ import pkg from 'body-parser';
 const { urlencoded } = pkg;
 import Database from '../lib/database.js';
 
+import winston from 'winston';
+
+// Create a logger
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: '/usr/src/app/pacman/logs/highscores.log' })
+  ]
+});
+
 import opentelemetry from '@opentelemetry/api'
 const tracer = opentelemetry.trace.getTracer('pacman')
 
@@ -12,12 +23,12 @@ var urlencodedParser = urlencoded({ extended: false })
 
 // middleware that is specific to this router
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date());
+  logger.info('Time: ', Date());
   next();
 })
 
 router.get('/list', urlencodedParser, function(req, res, next) {
-  console.log('[GET /highscores/list]');
+  logger.info('[GET /highscores/list]');
   Database.getDb(req.app, function(err, db) {
     const span = tracer.startSpan('/high_scores/list', {'kind':opentelemetry.SpanKind.SERVER});
     span.setAttribute('high_score_list', 'loading_score')
@@ -30,15 +41,15 @@ router.get('/list', urlencodedParser, function(req, res, next) {
     col.find({}).sort([['score', -1]]).limit(10).toArray(function(err, docs) {
       var result = [];
       if (err) {
-        console.log(err);
+        logger.error(err);
       }
 
       docs.forEach(function(item, index, array) {
         result.push({ name: item['name'], cloud: item['cloud'],
                       zone: item['zone'], host: item['host'],
                       score: item['score'] });
-        console.log('name: ', item['name']);
-        console.log('highscore: ', item['score']);
+        logger.info('name: ', item['name']);
+        logger.info('highscore: ', item['score']);
       });
 
       res.json(result);
@@ -49,7 +60,7 @@ router.get('/list', urlencodedParser, function(req, res, next) {
 
 // Accessed at /highscores
 router.post('/', urlencodedParser, function(req, res, next) {
-  console.log('[POST /highscores] body =', req.body,
+  logger.info('[POST /highscores] body =', req.body,
               ' host =', req.headers.host,
               ' user-agent =', req.headers['user-agent'],
               ' referer =', req.headers.referer);
@@ -88,10 +99,10 @@ router.post('/', urlencodedParser, function(req, res, next) {
       var returnStatus = '';
 
       if (err) {
-        console.log(err);
+        logger.error(err);
         returnStatus = 'error';
       } else {
-        console.log('Successfully inserted highscore');
+        logger.info('Successfully inserted highscore');
         returnStatus = 'success';
       }
 

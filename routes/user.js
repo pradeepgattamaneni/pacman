@@ -5,19 +5,29 @@ const { urlencoded } = pkg;
 import { ObjectId } from 'mongodb';
 import Database from '../lib/database.js';
 
+import winston from 'winston';
+
+// Create a logger
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: '/usr/src/app/pacman/logs/user.log' })
+  ]
+});
 
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = urlencoded({ extended: false })
 
 // middleware that is specific to this router
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date());
+  logger.info('Time: ', Date());
   next();
 })
 
 
 router.get('/id', function(req, res, next) {
-  console.log('[GET /user/id]');
+  logger.info('[GET /user/id]');
   Database.getDb(req.app, function(err, db) {
     if (err) {
       return next(err);
@@ -32,10 +42,10 @@ router.get('/id', function(req, res, next) {
       wtimeout: 10000
     }, function(err, result) {
       if (err) {
-        console.log('failed to insert new user ID err =', err);
+        logger.error('failed to insert new user ID err =', err);
       } else {
         userId = result.insertedId;
-        console.log('Successfully inserted new user ID = ', userId);
+        logger.info('Successfully inserted new user ID = ', userId);
       }
       res.json(userId);
     });
@@ -43,7 +53,7 @@ router.get('/id', function(req, res, next) {
 });
 
 router.post('/stats', urlencodedParser, function(req, res, next) {
-  console.log('[POST /user/stats]\n',
+  logger.info('[POST /user/stats]\n',
               ' body =', req.body, '\n',
               ' host =', req.headers.host,
               ' user-agent =', req.headers['user-agent'],
@@ -86,10 +96,10 @@ router.post('/stats', urlencodedParser, function(req, res, next) {
         var returnStatus = '';
 
         if (err) {
-          console.log(err);
+          logger.error(err);
           returnStatus = 'error';
         } else {
-          console.log('Successfully updated user stats');
+          logger.info('Successfully updated user stats');
           returnStatus = 'success';
         }
 
@@ -101,7 +111,7 @@ router.post('/stats', urlencodedParser, function(req, res, next) {
 });
 
 router.get('/stats', function(req, res, next) {
-  console.log('[GET /user/stats]');
+  logger.info('[GET /user/stats]');
 
   Database.getDb(req.app, function(err, db) {
     if (err) {
@@ -114,7 +124,7 @@ router.get('/stats', function(req, res, next) {
     col.find({ score: {$exists: true}}).sort([['_id', 1]]).toArray(function(err, docs) {
       var result = [];
       if (err) {
-          console.log(err);
+          logger.error(err);
       }
       docs.forEach(function(item, index, array) {
         result.push({

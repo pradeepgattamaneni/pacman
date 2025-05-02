@@ -5,6 +5,17 @@ import path from 'path';
 import {fileURLToPath} from 'url';
 import Database from './lib/database.js';
 
+import winston from 'winston';
+
+// Create a logger
+const logger = winston.createLogger({
+  level: 'info',
+  transports: [
+    new winston.transports.Console(),
+    new winston.transports.File({ filename: '/usr/src/app/pacman/logs/app.log' })
+  ]
+});
+
 // Constants
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,9 +65,9 @@ app.use(function(err, req, res, next) {
 
 Database.connect(app, function(err) {
   if (err) {
-    console.log('Failed to connect to database server');
+    logger.error('Failed to connect to database server');
   } else {
-    console.log('Connected to database server successfully');
+    logger.info('Connected to database server successfully');
   }
 });
 

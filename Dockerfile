@@ -15,6 +15,8 @@ COPY package*.json ./
 # Production
 RUN npm install
 
+RUN apk add --no-cache python3 make g++
+
 # Install the @splunk/otel package
 RUN npm install @splunk/otel
 RUN npm install @opentelemetry/api

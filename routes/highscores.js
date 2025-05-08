@@ -16,7 +16,7 @@ const logger = winston.createLogger({
 });
 
 import opentelemetry from '@opentelemetry/api'
-const tracer = opentelemetry.trace.getTracer('pacman')
+const tracer = opentelemetry.trace.getTracer('pacman-high-scores')
 
 // create application/x-www-form-urlencoded parser
 var urlencodedParser = urlencoded({ extended: false })

@@ -149,7 +149,10 @@ function geronimo() {
             type: "GET",
             url: "user/id",
             success: function(msg){
+                const span = tracer.startSpan('USER_ID');
                 game.user.id = msg;
+                span.setAttribute('dba_end_user.id', game.user.id);
+                span.end()
             }
         });
     }
@@ -181,8 +184,12 @@ function geronimo() {
     function addHighscore() {
         var name = $("input[type=text]").val();
         $("#highscore-form").html("Saving highscore...");
+        const span = tracer.startSpan('high_score');
         ajaxAdd(name, game.cloudProvider, game.zone, game.host,
                  game.score.score, game.level);
+        span.setAttribute('name', name);
+        span.setAttribute('high_score', game.score.score);
+        span.end();
     }
 
     function getUserId() {

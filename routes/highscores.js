@@ -15,6 +15,7 @@ const logger = winston.createLogger({
   ]
 });
 
+
 import opentelemetry from '@opentelemetry/api'
 const tracer = opentelemetry.trace.getTracer('pacman-high-scores')
 
@@ -102,7 +103,7 @@ router.post('/', urlencodedParser, function(req, res, next) {
         logger.error(err);
         returnStatus = 'error';
       } else {
-        logger.info('Successfully inserted highscore');
+	logger.info('Successfully inserted highscore');
         returnStatus = 'success';
       }
 

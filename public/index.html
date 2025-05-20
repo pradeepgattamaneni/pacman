@@ -9,6 +9,14 @@
         applicationName: "pacman",
         deploymentEnvironment: "production"
     });
+
+    SplunkRum.setGlobalAttributes({
+        'enduser.id': "pgattamaneni",
+        'enduser.role': 'admin'
+
+    });
+
+    var tracer=SplunkRum.provider.getTracer("pacman-tracer");
 </script>
 
 <script src="https://cdn.signalfx.com/o11y-gdi-rum/v0.20.3/splunk-otel-web-session-recorder.js" crossorigin="anonymous"></script>

@@ -32,6 +32,12 @@ spec:
               value: "104.196.11.24"
             - name: MONGO_VALIDATE_SSL
               value: "false"
+            - name: SPLUNK_METRICS_ENABLED
+              value: "true"
+            - name: SPLUNK_AUTOMATIC_LOG_COLLECTION
+              value: "true"
+            - name: SPLUNK_PROFILER_MEMORY_ENABLED
+              value: "true"
           command:
             - node
             - -r
